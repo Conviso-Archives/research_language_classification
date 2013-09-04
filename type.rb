@@ -18,19 +18,20 @@ require './macros.rb'
 module Profile
   class Type
     @@mlcomment = false
-    def Type::classify!(input = '')
+    def Type::classify!(input = '', use_extension = true)
+      @@use_extension = use_extension
       score_vector = {}
       
       if (File.exists?(input))
         score_vector = __classify_by_file_name(input)
-        
       else
         score_vector = __classify_by_string(input)
       end
       
       str1 = score_vector.inspect
-      str2 = score_vector.keys.sort {|a,b| score_vector[a] <=> score_vector[b]}.last.to_s
-      puts "#{ARGV[0]}\n#{str1}\n#{str2}\n\n"
+      str2 = score_vector.keys.sort {|a,b| score_vector[a] <=> score_vector[b]}.last
+      # puts "#{ARGV[0]}\n#{str1}\n#{str2}\n\n"
+      return str2
     end
     
     private
@@ -49,7 +50,7 @@ module Profile
       fd = File.open(input)
       score_vector = {}
       
-      score_vector = __analyse_file_extension(input)
+      score_vector = __analyse_file_extension(input) if @@use_extension
       while(!fd.eof?)
         line = fd.readline
         LANGUAGES_KEYWORDS.keys.collect do |k|
@@ -64,7 +65,7 @@ module Profile
     
     def Type::__analyse_file_extension(input)
       score_vector = {}
-      
+
       LANGUAGES_KEYWORDS.keys.each do |k|
         extension = LANGUAGES_KEYWORDS[k][:extension]
         score_vector[k] = score_vector[k].to_i
@@ -115,4 +116,4 @@ module Profile
   end
 end
 
-Profile::Type::classify!(ARGV[0])
+# Profile::Type::classify!(ARGV[0])
