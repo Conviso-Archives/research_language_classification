@@ -8,15 +8,18 @@ THREAD_LIMIT = 8
 class Individual
   attr_reader :iid
   attr_accessor :fit
-  def initialize(dict = {}, iid = 0, pipe = nil)
+  def initialize(dict = {}, iid = 0)
     @dict = dict
-    @pipe = pipe
-    @iid = iid
     @fit = nil
+    
+    @reader, @writer = IO.pipe
   end
   
-  def evaluation
-    @read.gets().to_f
+  def fit
+    if @fit.nil? 
+      @fit = @reader.gets.strip.to_f
+    end
+    return @fit
   end
   
   def crossover (other = nil)
@@ -49,8 +52,12 @@ class Individual
     
     total_error = errors.to_f * 100.00 / total.to_f
     
-    @pipe.puts "#{@iid} #{total_error}"
+    @writer.puts "#{total_error}"
     return total_error
+  end
+  
+  def crossover!(i = nil)
+    
   end
   
   private
