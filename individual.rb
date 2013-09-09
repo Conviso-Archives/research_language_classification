@@ -23,6 +23,7 @@ class Individual
   end
   
   def crossover (other = nil)
+    
   end
   
   def mutate!
