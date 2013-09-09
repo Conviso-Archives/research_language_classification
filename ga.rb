@@ -1,8 +1,8 @@
 require './individual.rb'
 require './macros.rb'
 
-population_size = 14
-iterations = 200
+population_size = 6
+iterations = 1
 paralelism = 6
 
 def __rdn_dict(list = nil)
