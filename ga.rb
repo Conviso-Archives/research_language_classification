@@ -1,10 +1,20 @@
 require './individual.rb'
 require './macros.rb'
 require 'pry'
+require 'yaml'
 
-population_size = 6
-iterations = 1
+population_size = 12
+iterations = 200
 paralelism = 6
+
+
+File.delete('fitness.txt') if File.exists?('fitness.txt')
+File.delete('best_solution.txt') if File.exists?('best_solution.txt')
+
+fitness_fd = File.open('fitness.txt', 'a')
+best_solution_fd = File.open('best_solution.txt', 'a')
+
+
 
 def __rdn_dict(list = nil)
   new_dict = {}
@@ -21,7 +31,7 @@ def __rdn_dict(list = nil)
 end
 
 population = (1..population_size).collect { |x|
-  Individual.new(__rdn_dict(LANGUAGES_KEYWORDS), (x-1))
+  Individual.new(__rdn_dict(LANGUAGES_KEYWORDS))
 }
 
 hall_of_fame = []
@@ -70,6 +80,15 @@ process_pool = []
   # Storing the 5 best solution
   hall_of_fame = (hall_of_fame + population[0..4]).sort {|a,b| a.fit <=> b.fit}[0..4].collect {|i| i.clone}
   
+  puts "[+] Global Best #{hall_of_fame.first.fit}"
+  
+  fitness_fd.puts(hall_of_fame.first.fit)
+  fitness_fd.flush
+  best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
+  best_solution_fd.flush
+  
   population.each { |i| i.crossover!(hall_of_fame.sample) }
 end
- 
+
+fitness_fd.close
+best_solution_fd.close

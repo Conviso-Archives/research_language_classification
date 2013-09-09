@@ -8,9 +8,9 @@ THREAD_LIMIT = 8
 
 
 class Individual
-  attr_reader :iid, :dict
+  attr_reader :dict
   attr_accessor :fit, :fit_counter
-  def initialize(dict = {}, iid = 0)
+  def initialize(dict = {})
     @dict = dict
     @fit = nil
     @fit_counter = nil
@@ -24,10 +24,6 @@ class Individual
       @fit_counter = YAML.load(Base64.decode64(@reader.gets.strip))
     end
     return @fit
-  end
-  
-  def crossover (other = nil)
-    
   end
   
   def mutate!
@@ -77,10 +73,32 @@ class Individual
   def crossover!(i = nil)
     @dict.keys.each do |lang|
       perc = @fit_counter[lang][:error] < i.fit_counter[lang][:error]? 0.4 : 0.1
+      
+      my_genetic = @dict[lang][:keyword].shuffle[0..(perc * @dict[lang][:keyword].size).to_i]
+      p_genetic = i.dict[lang][:keyword].shuffle[0..((1.0 - perc) * i.dict[lang][:keyword].size).to_i]
+      @dict[lang][:keyword] = (my_genetic + p_genetic).uniq
+      mutate!(lang)
     end
+    
     
     @fit = nil
     @fit_counter = nil
+  end
+  
+  def mutate!(lang)
+    return if @fit_counter[lang][:total].zero?
+
+    error = @fit_counter[lang][:error].to_f / @fit_counter[lang][:total].to_f
+#     puts "[+] changing keyword in [#{error}%]"
+    num_changing = (error * @dict[lang][:keyword].size).to_i
+#     puts "[+] num changing #{num_changing}"
+    new_size = @dict[lang][:keyword].size - num_changing
+    new_kw = LANGUAGES_KEYWORDS[lang][:keyword][0..num_changing]
+    old_kw = @dict[lang][:keyword].shuffle[0..new_size]
+#     puts "OLD: #{@dict[lang][:keyword].sort.inspect}"
+    @dict[lang][:keyword] = (new_kw + old_kw).uniq
+#     puts "NEW: #{@dict[lang][:keyword].sort.inspect}"
+#     exit
   end
   
   private
