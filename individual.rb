@@ -75,7 +75,15 @@ class Individual
   end
   
   def crossover!(i = nil)
-    
+    @dict.keys.each do |lang|
+#       puts "#{lang.inspect}"
+#       puts "#{@fit_counter.inspect}"
+      puts i.inspect
+      puts i.fit.inspect
+      puts "#{i.fit_counter.inspect}"
+      perc = @fit_counter[lang][:error] < i.fit_counter[lang][:error]? 0.4 : 0.1
+      puts "#{perc}"
+    end
     
     @fit = nil
     @fit_counter = nil
