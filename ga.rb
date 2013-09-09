@@ -1,5 +1,6 @@
 require './individual.rb'
 require './macros.rb'
+require 'pry'
 
 population_size = 6
 iterations = 1
@@ -67,7 +68,7 @@ process_pool = []
   puts "[+] Less fittest individual: #{population.last.fit}"
   
   # Storing the 5 best solution
-  hall_of_fame = (hall_of_fame + population[0..4]).sort {|a,b| a.fit <=> b.fit}[0..4].clone
+  hall_of_fame = (hall_of_fame + population[0..4]).sort {|a,b| a.fit <=> b.fit}[0..4].collect {|i| i.clone}
   
   population.each { |i| i.crossover!(hall_of_fame.sample) }
 end
