@@ -72,7 +72,7 @@ process_pool = []
     
 
   # Checking out all the results after processing all population
-  puts "\n[+] Collecting results for this population"
+  puts "[+] Collecting results for this population"
   population.sort!{|a,b| a.fit <=> b.fit}
   puts "[+] Fittest individual: #{population.first.fit}"
   puts "[+] Less fittest individual: #{population.last.fit}"
@@ -88,6 +88,7 @@ process_pool = []
   best_solution_fd.flush
   
   population.each { |i| i.crossover!(hall_of_fame.sample) }
+  puts "\n"
 end
 
 fitness_fd.close
