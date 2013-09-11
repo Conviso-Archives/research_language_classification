@@ -2,11 +2,14 @@ require './individual.rb'
 require './macros.rb'
 require 'pry'
 require 'yaml'
+require 'digest/sha1'
+
+
 
 population_size = 12
 iterations = 200
 paralelism = 6
-
+already_tested = []
 
 File.delete('fitness.txt') if File.exists?('fitness.txt')
 File.delete('best_solution.txt') if File.exists?('best_solution.txt')
@@ -14,6 +17,11 @@ File.delete('best_solution.txt') if File.exists?('best_solution.txt')
 fitness_fd = File.open('fitness.txt', 'a')
 best_solution_fd = File.open('best_solution.txt', 'a')
 
+
+def __calculate_dict_hash(individual = nil)
+  str = individual.dict.keys.collect {|lang| individual.dict[lang].sort.join(',') }.sort.join('|')
+  return Digest::SHA1.hexdigest(str)
+end
 
 
 def __rdn_dict(list = nil)
@@ -42,6 +50,10 @@ process_pool = []
 (1..iterations).each do |iteration|
   i = 1
   puts "[+] Starting iteration [#{iteration}]"
+  
+  already_tested += population.collect { |i| __calculate_dict_hash(i)}
+  already_tested.uniq!
+  puts "[+] Tested buffer size is: [#{already_tested.size}]"
   
   while i <= population_size  do
 
@@ -87,7 +99,14 @@ process_pool = []
   best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
   best_solution_fd.flush
   
-  population.each { |i| i.crossover!(hall_of_fame.sample) }
+  population.each do |i| 
+    i.crossover!(hall_of_fame.sample) 
+    while(already_tested.include?(__calculate_dict_hash(i)))
+#       puts '[+] CHANGING AGAIN'
+      i.crossover!(hall_of_fame.sample) 
+    end
+
+  end
   puts "\n"
 end
 
