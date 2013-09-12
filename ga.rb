@@ -6,10 +6,14 @@ require 'digest/sha1'
 
 
 
-population_size = 12
+population_size = 6
+hall_of_fame_size = 2
 iterations = 200
-paralelism = 6
+paralelism = 3
 already_tested = []
+randomize_threshold = 3
+counter = {:total_tests => 0, :repeated_tests => 0, :envolve_period => 0}
+
 
 File.delete('fitness.txt') if File.exists?('fitness.txt')
 File.delete('best_solution.txt') if File.exists?('best_solution.txt')
@@ -42,7 +46,7 @@ population = (1..population_size).collect { |x|
   Individual.new(__rdn_dict(LANGUAGES_KEYWORDS))
 }
 
-hall_of_fame = []
+hall_of_fame = population[0..hall_of_fame_size]
 
 puts "[+] Creating a population of #{population.size} individuals"
 
@@ -53,7 +57,6 @@ process_pool = []
   
   already_tested += population.collect { |i| __calculate_dict_hash(i)}
   already_tested.uniq!
-  puts "[+] Tested buffer size is: [#{already_tested.size}]"
   
   while i <= population_size  do
 
@@ -89,8 +92,22 @@ process_pool = []
   puts "[+] Fittest individual: #{population.first.fit}"
   puts "[+] Less fittest individual: #{population.last.fit}"
   
-  # Storing the 5 best solution
-  hall_of_fame = (hall_of_fame + population[0..4]).sort {|a,b| a.fit <=> b.fit}[0..4].collect {|i| i.clone}
+  # Storing the "hall_of_fame_size" best solution
+  last_fittest = hall_of_fame.first.fit
+  hall_of_fame = (hall_of_fame + population[0..hall_of_fame_size]).sort {|a,b| a.fit <=> b.fit}[0..hall_of_fame_size].collect {|i| i.clone}
+  new_fittest = hall_of_fame.first.fit
+  
+  if last_fittest == new_fittest
+    counter[:envolve_period] += 1
+  end
+  
+  if counter[:envolve_period] == randomize_threshold
+    puts "[+] Randomizing half of the population ..."
+    population[0..(population_size/2)].each { |i|
+      i.dict = __rdn_dict(LANGUAGES_KEYWORDS)
+    }
+    counter[:envolve_period] = 0
+  end
   
   puts "[+] Global Best #{hall_of_fame.first.fit}"
   
@@ -100,13 +117,15 @@ process_pool = []
   best_solution_fd.flush
   
   population.each do |i| 
-    i.crossover!(hall_of_fame.sample) 
+    i.crossover!(hall_of_fame.sample)
+    counter[:total_tests] += 1
     while(already_tested.include?(__calculate_dict_hash(i)))
-#       puts '[+] CHANGING AGAIN'
+      counter[:repeated_tests] += 1
       i.crossover!(hall_of_fame.sample) 
     end
 
   end
+  puts counter.inspect
   puts "\n"
 end
 

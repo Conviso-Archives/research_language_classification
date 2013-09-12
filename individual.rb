@@ -8,8 +8,7 @@ THREAD_LIMIT = 8
 
 
 class Individual
-  attr_reader :dict
-  attr_accessor :fit, :fit_counter
+  attr_accessor :fit, :fit_counter, :dict
   def initialize(dict = {})
     @dict = dict
     @fit = nil
