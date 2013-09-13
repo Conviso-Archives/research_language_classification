@@ -4,12 +4,10 @@ require 'pry'
 require 'yaml'
 require 'digest/sha1'
 
-
-
-population_size = 6
-hall_of_fame_size = 2
+population_size = 12
+hall_of_fame_size = 3
 iterations = 200
-paralelism = 3
+paralelism = 6
 already_tested = []
 randomize_threshold = 3
 counter = {:total_tests => 0, :repeated_tests => 0, :envolve_period => 0}
@@ -92,6 +90,14 @@ process_pool = []
   puts "[+] Fittest individual: #{population.first.fit}"
   puts "[+] Less fittest individual: #{population.last.fit}"
   
+  if counter[:envolve_period] == randomize_threshold
+    puts "[+] Randomizing half of the population ..."
+    population.sort {|a,b| a.fit <=> b.fit}[(population_size/2)..-1].each { |i|
+      i.dict = __rdn_dict(LANGUAGES_KEYWORDS)
+    }
+    counter[:envolve_period] = 0
+  end
+  
   # Storing the "hall_of_fame_size" best solution
   last_fittest = hall_of_fame.first.fit
   hall_of_fame = (hall_of_fame + population[0..hall_of_fame_size]).sort {|a,b| a.fit <=> b.fit}[0..hall_of_fame_size].collect {|i| i.clone}
@@ -99,14 +105,6 @@ process_pool = []
   
   if last_fittest == new_fittest
     counter[:envolve_period] += 1
-  end
-  
-  if counter[:envolve_period] == randomize_threshold
-    puts "[+] Randomizing half of the population ..."
-    population[0..(population_size/2)].each { |i|
-      i.dict = __rdn_dict(LANGUAGES_KEYWORDS)
-    }
-    counter[:envolve_period] = 0
   end
   
   puts "[+] Global Best #{hall_of_fame.first.fit}"
@@ -125,6 +123,8 @@ process_pool = []
     end
 
   end
+  
+  
   puts counter.inspect
   puts "\n"
 end
