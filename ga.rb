@@ -4,10 +4,10 @@ require 'pry'
 require 'yaml'
 require 'digest/sha1'
 
-population_size = 6
-hall_of_fame_size = 2
+population_size = 12
+hall_of_fame_size = 3
 iterations = 200
-paralelism = 3
+paralelism = 6
 already_tested = []
 randomize_threshold = 3
 counter = {:total_tests => 0, :repeated_tests => 0, :envolve_period => 0}

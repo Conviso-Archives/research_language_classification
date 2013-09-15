@@ -18,7 +18,9 @@ require './macros.rb'
 module Profile
   class Type
     @@mlcomment = false
-    def Type::classify!(input = '', use_extension = true)
+    def Type::classify!(input = '', use_extension = true, dict = nil)
+      @dict = dict || LANGUAGES_KEYWORDS
+      
       @@use_extension = use_extension
       score_vector = {}
       
@@ -38,7 +40,7 @@ module Profile
     def Type::__classify_by_string(input = '')
       score_vector = {}
 
-      LANGUAGES_KEYWORDS.keys.collect do |k|
+      @dict.keys.collect do |k|
         score_vector[k] = score_vector[k].to_i
         score_vector[k] += __analyse_string_for_language(k, input)
       end
@@ -53,7 +55,7 @@ module Profile
       score_vector = __analyse_file_extension(input) if @@use_extension
       while(!fd.eof?)
         line = fd.readline
-        LANGUAGES_KEYWORDS.keys.collect do |k|
+        @dict.keys.collect do |k|
           score_vector[k] = score_vector[k].to_i
           score_vector[k] += __analyse_string_for_language(k, line)
         end
@@ -66,10 +68,10 @@ module Profile
     def Type::__analyse_file_extension(input)
       score_vector = {}
 
-      LANGUAGES_KEYWORDS.keys.each do |k|
-        extension = LANGUAGES_KEYWORDS[k][:extension]
+      @dict.keys.each do |k|
+        extension = @dict[k][:extension]
         score_vector[k] = score_vector[k].to_i
-        score_vector[k] += EXTENSION_WEIGHT if extension.include?("." + input.split('.').last)
+        score_vector[k] += @dict if extension.include?("." + input.split('.').last)
       end
       
       return score_vector
@@ -78,7 +80,7 @@ module Profile
     def Type::__analyse_string_for_language(k, line)
       unique_keywords = __get_unique_keywords_for_language(k)
       intersection_group = __get_intersection_group
-      keywords = LANGUAGES_KEYWORDS[k][:keyword] - unique_keywords
+      keywords = @dict[k][:keyword] - unique_keywords
       keywords -= intersection_group
       line.strip!
       
@@ -103,7 +105,7 @@ module Profile
     end
     
     def Type::__get_unique_keywords_for_language(k)
-      tks = LANGUAGES_KEYWORDS.clone
+      tks = @dict.clone
       ks = []
       ks << tks.delete(k)[:keyword]
       tks.each {|k1,v| ks << v[:keyword]}
@@ -111,7 +113,7 @@ module Profile
     end
     
     def Type::__get_intersection_group
-      LANGUAGES_KEYWORDS.collect {|k,v|v[:keyword]}.inject {|a,b| a & b}
+      @dict.collect {|k,v|v[:keyword]}.inject {|a,b| a & b}
     end
   end
 end
