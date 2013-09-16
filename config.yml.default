@@ -1,0 +1,6 @@
+---
+:population_size: 12
+:hall_of_fame_size: 2
+:iterations: 200
+:paralelism: 6
+:randomize_threshold: 5

@@ -114,7 +114,8 @@ class Individual
   def __analyse_file(file = nil)
     begin
       return Profile::Type::classify!(file, false, @dict)
-    rescue
+    rescue Exception => e
+#       puts "[!] Error #{e.message}"
       return ''
     end
   end

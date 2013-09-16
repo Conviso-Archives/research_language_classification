@@ -4,6 +4,7 @@ bin/
 bin-debug/
 bin-release/
 *.txt
+*.yml
 
 # Other files and folders
 .settings/

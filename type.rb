@@ -117,5 +117,3 @@ module Profile
     end
   end
 end
-
-# Profile::Type::classify!(ARGV[0])

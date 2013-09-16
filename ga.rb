@@ -4,12 +4,14 @@ require 'pry'
 require 'yaml'
 require 'digest/sha1'
 
-population_size = 12
-hall_of_fame_size = 3
-iterations = 200
-paralelism = 6
+if !File.exists?('config.yml')
+  puts '[!] config.yml not found.'
+  exit
+end
+
+config = YAML.load_file('config.yml')
+
 already_tested = []
-randomize_threshold = 3
 counter = {:total_tests => 0, :repeated_tests => 0, :envolve_period => 0}
 
 
@@ -40,23 +42,23 @@ def __rdn_dict(list = nil)
   return new_dict
 end
 
-population = (1..population_size).collect { |x|
+population = (1..config[:population_size]).collect { |x|
   Individual.new(__rdn_dict(LANGUAGES_KEYWORDS))
 }
 
-hall_of_fame = population[0..hall_of_fame_size]
+hall_of_fame = population[0..config[:hall_of_fame_size]]
 
 puts "[+] Creating a population of #{population.size} individuals"
 
 process_pool = []
-(1..iterations).each do |iteration|
+(1..config[:iterations]).each do |iteration|
   i = 1
   puts "[+] Starting iteration [#{iteration}]"
   
   already_tested += population.collect { |i| __calculate_dict_hash(i)}
   already_tested.uniq!
   
-  while i <= population_size  do
+  while i <= config[:population_size]  do
 
     # Calculates number of active processes
     process_pool = process_pool.select do |pid| 
@@ -69,7 +71,7 @@ process_pool = []
     end # do
     
     # If there is space inside the process pool just trigger one more process
-    if process_pool.size < paralelism
+    if process_pool.size < config[:paralelism]
 #       puts "[+] Process pool with size #{process_pool.size}"
 #       puts "[+] Adding a new process to the process pool"
       pid = fork {
@@ -91,9 +93,9 @@ process_pool = []
   puts "[+] Less fittest individual: #{population.last.fit}"
   
   
-  # Storing the "hall_of_fame_size" best solution
+  # Storing the "config[:hall_of_fame_size]" best solution
   last_fittest = hall_of_fame.first.fit
-  hall_of_fame = (hall_of_fame + population[0..hall_of_fame_size]).sort {|a,b| a.fit <=> b.fit}[0..hall_of_fame_size].collect {|i| i.clone}
+  hall_of_fame = (hall_of_fame + population[0..config[:hall_of_fame_size]]).sort {|a,b| a.fit <=> b.fit}[0..config[:hall_of_fame_size]].collect {|i| i.clone}
   new_fittest = hall_of_fame.first.fit
   
   if last_fittest == new_fittest
@@ -119,9 +121,9 @@ process_pool = []
 
   end
   
-  if counter[:envolve_period] == randomize_threshold
+  if counter[:envolve_period] == config[:randomize_threshold]
     puts "[+] Randomizing half of the population ..."
-    population[(population_size/2)..-1].each { |i|
+    population[(config[:population_size]/2)..-1].each { |i|
       i.dict = __rdn_dict(LANGUAGES_KEYWORDS)
     }
     counter[:envolve_period] = 0
