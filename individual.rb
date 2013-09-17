@@ -90,21 +90,23 @@ class Individual
 
     num_changing = (error * @dict[lang][:keyword].size).to_i
     
-    if @dict[lang][:keyword].size.zero?
-      num_changing = (error * LANGUAGES_KEYWORDS[lang][:keyword].size).to_i
+    if @dict[lang][:keyword].empty?
+      if error.zero?
+	num_changing = (LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
+      else
+	num_changing = (error * LANGUAGES_KEYWORDS[lang][:keyword].size).to_i
+      end
     end
     
     new_size = @dict[lang][:keyword].size - num_changing
     new_kw = LANGUAGES_KEYWORDS[lang][:keyword][0..(num_changing*2)]
-    old_kw = @dict[lang][:keyword].shuffle[0..new_size]
+    old_kw = @dict[lang][:keyword].shuffle[0..new_size] 
 
-    if rand(2).zero? || @dict[lang][:keyword].size.zero?
+    if rand(2).zero? || @dict[lang][:keyword].empty?
       @dict[lang][:keyword] = (old_kw + new_kw).uniq
     else
       @dict[lang][:keyword] = (old_kw - new_kw).uniq
     end
-    
-    crossover!(i) if @dict[lang][:keyword].empty?
   end
   
   private
