@@ -76,6 +76,10 @@ class Individual
       p_genetic = i.dict[lang][:keyword].shuffle[0..((1.0 - perc) * i.dict[lang][:keyword].size).to_i]
       @dict[lang][:keyword] = (my_genetic + p_genetic).uniq
       mutate!(lang, i)
+      while (@dict[lang][:keyword].empty?) 
+	puts "[+] dict for #{lang} is empty, mutating ..."
+	mutate!(lang, i)
+      end
     end
     
     
@@ -91,15 +95,11 @@ class Individual
     num_changing = (error * @dict[lang][:keyword].size).to_i
     
     if @dict[lang][:keyword].empty?
-      if error.zero?
-	num_changing = (LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
-      else
-	num_changing = (error * LANGUAGES_KEYWORDS[lang][:keyword].size).to_i
-      end
+      num_changing = (LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
     end
     
-    new_size = @dict[lang][:keyword].size - num_changing
-    new_kw = LANGUAGES_KEYWORDS[lang][:keyword][0..(num_changing*2)]
+    new_size = (@dict[lang][:keyword].size - num_changing).abs
+    new_kw = LANGUAGES_KEYWORDS[lang][:keyword].shuffle[0..(num_changing)]
     old_kw = @dict[lang][:keyword].shuffle[0..new_size] 
 
     if rand(2).zero? || @dict[lang][:keyword].empty?
