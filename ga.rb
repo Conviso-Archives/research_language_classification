@@ -90,7 +90,7 @@ process_pool = []
   puts "[+] Collecting results for this population"
   population.sort!{|a,b| a.fit <=> b.fit}
   puts "[+] Fittest individual: #{population.first.fit}"
-  puts "[+] Less fittest individual: #{population.last.fit}"
+  puts "[+] Less fit individual: #{population.last.fit}"
   
   
   # Storing the "config[:hall_of_fame_size]" best solution
