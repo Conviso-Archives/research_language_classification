@@ -75,7 +75,7 @@ class Individual
       my_genetic = @dict[lang][:keyword].shuffle[0..(perc * @dict[lang][:keyword].size).to_i]
       p_genetic = i.dict[lang][:keyword].shuffle[0..((1.0 - perc) * i.dict[lang][:keyword].size).to_i]
       @dict[lang][:keyword] = (my_genetic + p_genetic).uniq
-      mutate!(lang)
+      mutate!(lang, i)
     end
     
     
@@ -83,7 +83,7 @@ class Individual
     @fit_counter = nil
   end
   
-  def mutate!(lang)
+  def mutate!(lang, i)
     return if @fit_counter[lang][:total].zero?
 
     error = @fit_counter[lang][:error].to_f / @fit_counter[lang][:total].to_f
@@ -103,11 +103,8 @@ class Individual
     else
       @dict[lang][:keyword] = (old_kw - new_kw).uniq
     end
-
-#     puts "[+] changing keyword in [#{error * 100}%]"
-#     puts "[+] num changing #{num_changing}"
-#     puts "OLD: #{@dict[lang][:keyword].sort.inspect}"
-#     puts "NEW: #{@dict[lang][:keyword].sort.inspect}"
+    
+    crossover!(i) if @dict[lang][:keyword].empty?
   end
   
   private
