@@ -6,7 +6,6 @@ PPOOL_DIR = './ppool'
 SAMPLE_DIR = './sample'
 THREAD_LIMIT = 8
 
-
 class Individual
   attr_accessor :fit, :fit_counter, :dict
   def initialize(dict = {})

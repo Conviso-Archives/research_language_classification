@@ -3,6 +3,7 @@ require './macros.rb'
 require 'pry'
 require 'yaml'
 require 'digest/sha1'
+require 'net/smtp'
 
 hostname = `hostname`.strip
 
@@ -24,6 +25,22 @@ File.delete('best_solution.txt') if File.exists?('best_solution.txt')
 fitness_fd = File.open('fitness.txt', 'a')
 best_solution_fd = File.open('best_solution.txt', 'a')
 
+
+def send_email(optimum = '', hostname = nil)
+  puts '[+] Sending e-mail ...'
+message = <<MESSAGE_END
+From: BOT_#{hostname} <#{hostname}@marcosalvares.com>
+To: Marcos Alvares <marcos.alvares@gmail.com>
+Subject: I FOUND A NEW OPTIMUM! [#{optimum}]
+
+I FOUND A NEW OPTIMUM! [#{optimum}]
+#{Time.now}
+MESSAGE_END
+
+  Net::SMTP.start('localhost') do |smtp|
+    smtp.send_message message, "#{hostname}@marcosalvares.com", 'marcos.alvares@gmail.com'
+  end
+end
 
 def __calculate_dict_hash(individual = nil)
   str = individual.dict.keys.collect {|lang| individual.dict[lang].sort.join(',') }.sort.join('|')
@@ -113,6 +130,7 @@ process_pool = []
     fitness_fd.flush
     best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
     best_solution_fd.flush
+    send_email(new_fittest, hostname)
   end
 
   population.sort!{|a,b| a.fit <=> b.fit}
