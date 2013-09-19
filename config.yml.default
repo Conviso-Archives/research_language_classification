@@ -4,3 +4,4 @@
 :iterations: 200
 :paralelism: 6
 :randomize_threshold: 5
+:send_email: false
