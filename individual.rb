@@ -24,9 +24,6 @@ class Individual
     return @fit
   end
   
-  def mutate!
-  end
-  
   def evaluate
     counter = {
       :c => {:total => 0, :error => 0, :extension => ['.h', '.c']}, 
