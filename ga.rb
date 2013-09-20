@@ -130,7 +130,7 @@ process_pool = []
     fitness_fd.flush
     best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
     best_solution_fd.flush
-    send_email(new_fittest, hostname)
+    send_email(new_fittest, hostname) if config[:send_email]
   end
 
   population.sort!{|a,b| a.fit <=> b.fit}
@@ -146,7 +146,7 @@ process_pool = []
   
   if counter[:envolve_period] == config[:randomize_threshold]
     puts "[+] Randomizing half of the population ..."
-    population[(config[:population_size]/2)..-1].each { |i|
+    population.shuffle[(config[:population_size]/2)..-1].each { |i|
       i.dict = __rdn_dict(LANGUAGES_KEYWORDS)
     }
     counter[:envolve_period] = 0

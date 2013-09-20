@@ -69,7 +69,7 @@ class Individual
   
   def crossover!(i = nil)
     @dict.keys.each do |lang|
-      perc = @fit_counter[lang][:error] < i.fit_counter[lang][:error]? 0.8 : 0.2
+      perc = @fit_counter[lang][:error] < i.fit_counter[lang][:error]? 0.6 : 0.4
       
       my_genetic = @dict[lang][:keyword].shuffle[0..(perc * @dict[lang][:keyword].size).to_i]
       p_genetic = i.dict[lang][:keyword].shuffle[0..((1.0 - perc) * i.dict[lang][:keyword].size).to_i]
