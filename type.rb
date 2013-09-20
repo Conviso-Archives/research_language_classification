@@ -49,6 +49,7 @@ module Profile
     end
 
     def Type::__classify_by_file_name(input = '')
+
       fd = File.open(input)
       score_vector = {}
       
@@ -71,7 +72,7 @@ module Profile
       @dict.keys.each do |k|
         extension = @dict[k][:extension]
         score_vector[k] = score_vector[k].to_i
-        score_vector[k] += @dict if extension.include?("." + input.split('.').last)
+        score_vector[k] += EXTENSION_WEIGHT if extension.include?("." + input.split('.').last)
       end
       
       return score_vector
