@@ -66,7 +66,7 @@ population = (1..config[:population_size]).collect { |x|
   Individual.new(__rdn_dict(LANGUAGES_KEYWORDS))
 }
 
-hall_of_fame = population[0..config[:hall_of_fame_size]]
+hall_of_fame = population[0..(config[:hall_of_fame_size]-1)]
 
 puts "[+] Creating a population of #{population.size} individuals"
 
@@ -115,8 +115,10 @@ process_pool = []
   
   # Storing the "config[:hall_of_fame_size]" best solution
   last_fittest = hall_of_fame.first.fit
-  hall_of_fame = (hall_of_fame + population[0..config[:hall_of_fame_size]]).sort {|a,b| a.fit <=> b.fit}[0..config[:hall_of_fame_size]].collect {|i| i.clone}
+  hall_of_fame = (hall_of_fame + population[0..(config[:hall_of_fame_size]-1)]).sort {|a,b| a.fit <=> b.fit}[0..(config[:hall_of_fame_size]-1)].collect {|i| i.clone}
   new_fittest = hall_of_fame.first.fit
+  
+  puts "[+] Hall of Fame: [#{hall_of_fame.collect {|i| i.fit}.join(', ')}]"
   
   if last_fittest == new_fittest
     counter[:envolve_period] += 1
@@ -125,7 +127,7 @@ process_pool = []
   puts "[+] Global Best #{hall_of_fame.first.fit}"
   
   if new_fittest < last_fittest
-    system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
+    system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo #{iteration} #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
     fitness_fd.puts(hall_of_fame.first.fit)
     fitness_fd.flush
     best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
