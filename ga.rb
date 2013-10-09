@@ -67,6 +67,7 @@ population = (1..config[:population_size]).collect { |x|
 }
 
 hall_of_fame = population[0..(config[:hall_of_fame_size]-1)]
+system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo [#{Time.now}] 0 #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
 
 puts "[+] Creating a population of #{population.size} individuals"
 
@@ -127,7 +128,7 @@ process_pool = []
   puts "[+] Global Best #{hall_of_fame.first.fit}"
   
   if new_fittest < last_fittest
-    system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo #{iteration} #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
+    system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo [#{Time.now}] #{iteration} #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
     fitness_fd.puts(hall_of_fame.first.fit)
     fitness_fd.flush
     best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)

@@ -95,13 +95,13 @@ class Individual
     end
     
     new_size = (@dict[lang][:keyword].size - num_changing).abs
-    new_kw = LANGUAGES_KEYWORDS[lang][:keyword].shuffle[0..(num_changing)]
+    new_kw = (LANGUAGES_KEYWORDS[lang][:keyword] - @dict[lang][:keyword]).shuffle[0..(num_changing)]
     old_kw = @dict[lang][:keyword].shuffle[0..new_size] 
 
     if !rand(3).zero? || @dict[lang][:keyword].empty?
       @dict[lang][:keyword] = (old_kw + new_kw).uniq
     else
-      @dict[lang][:keyword] = (@dict[lang][:keyword] - new_kw).uniq
+      @dict[lang][:keyword] = (@dict[lang][:keyword][num_changing..-1]).uniq
     end
   end
   
