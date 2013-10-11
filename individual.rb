@@ -65,6 +65,12 @@ class Individual
   end
   
   def crossover!(i = nil)
+#     puts '[+] Starting crossover process ...'
+#     puts "[+] TOTAL: #{LANGUAGES_KEYWORDS.collect{|k,v| {k => v[:keyword].size}}.inspect}"
+    
+#     puts "[+] Dad([#{self.object_id}]):  #{@dict.collect{|k,v| {k => v[:keyword].size}}.inspect}"
+#     puts "[+] Mom([#{self.object_id}]):  #{i.dict.collect{|k,v| {k => v[:keyword].size}}.inspect}"
+    
     @dict.keys.each do |lang|
       perc = @fit_counter[lang][:error] < i.fit_counter[lang][:error]? 0.6 : 0.4
       
@@ -78,7 +84,7 @@ class Individual
       end
     end
     
-    
+    puts "[+] Kid([#{self.object_id}]):  #{@dict.collect{|k,v| {k => v[:keyword].size}}.inspect}"
     @fit = nil
     @fit_counter = nil
   end
@@ -88,7 +94,7 @@ class Individual
 
     error = @fit_counter[lang][:error].to_f / @fit_counter[lang][:total].to_f
 
-    num_changing = (error * @dict[lang][:keyword].size).to_i
+    num_changing = (error * @dict[lang][:keyword].size/2).to_i
     
     if @dict[lang][:keyword].empty?
       num_changing = (LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
@@ -99,9 +105,12 @@ class Individual
     old_kw = @dict[lang][:keyword].shuffle[0..new_size] 
 
     if !rand(3).zero? || @dict[lang][:keyword].empty?
+#       puts "[ADDING (#{self.object_id}) (#{lang})] #{num_changing}"
       @dict[lang][:keyword] = (old_kw + new_kw).uniq
     else
-      @dict[lang][:keyword] = (@dict[lang][:keyword][num_changing..-1]).uniq
+      num_changing = num_changing > (0.2 * @dict[lang][:keyword].size) ? (0.2 * @dict[lang][:keyword].size).to_i : num_changing
+#       puts "[REMOVING (#{self.object_id}) (#{lang})] #{num_changing}"
+      @dict[lang][:keyword] = (@dict[lang][:keyword][(num_changing-1)..-1]).uniq
     end
   end
   
