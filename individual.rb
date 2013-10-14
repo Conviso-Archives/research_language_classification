@@ -84,7 +84,7 @@ class Individual
       end
     end
     
-    puts "[+] Kid([#{self.object_id}]):  #{@dict.collect{|k,v| {k => v[:keyword].size}}.inspect}"
+#     puts "[+] Kid([#{self.object_id}]):  #{@dict.collect{|k,v| {k => v[:keyword].size}}.inspect}"
     @fit = nil
     @fit_counter = nil
   end
@@ -94,17 +94,16 @@ class Individual
 
     error = @fit_counter[lang][:error].to_f / @fit_counter[lang][:total].to_f
 
-    num_changing = (error * @dict[lang][:keyword].size/2).to_i
+    num_changing = (rand(@dict[lang][:keyword].size/2)+1).to_i
     
     if @dict[lang][:keyword].empty?
-      num_changing = (LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
+      num_changing = rand(LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
     end
     
-    new_size = (@dict[lang][:keyword].size - num_changing).abs
-    new_kw = (LANGUAGES_KEYWORDS[lang][:keyword] - @dict[lang][:keyword]).shuffle[0..(num_changing)]
-    old_kw = @dict[lang][:keyword].shuffle[0..new_size] 
 
     if !rand(3).zero? || @dict[lang][:keyword].empty?
+      new_kw = (LANGUAGES_KEYWORDS[lang][:keyword] - @dict[lang][:keyword]).shuffle[0..num_changing]
+      old_kw = @dict[lang][:keyword].shuffle[num_changing..-1] 
 #       puts "[ADDING (#{self.object_id}) (#{lang})] #{num_changing}"
       @dict[lang][:keyword] = (old_kw + new_kw).uniq
     else

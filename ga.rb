@@ -13,7 +13,7 @@ if !File.exists?('config.yml')
 end
 
 config = YAML.load_file('config.yml')
-# system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'cat /dev/null > ~/experiment/#{hostname}.txt'")
+system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'cat /dev/null > ~/experiment/#{hostname}.txt'")
 
 already_tested = []
 counter = {:total_tests => 0, :repeated_tests => 0, :envolve_period => 0}
@@ -126,7 +126,7 @@ process_pool = []
   puts "[+] Global Best #{hall_of_fame.first.fit}"
   
   if new_fittest < last_fittest
-#     system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo [#{Time.now}] #{iteration} #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
+    system("ssh -i /home/mabj/.ssh/experiment_id_dsa experiment@marcosalvares.com 'echo [#{Time.now}] #{iteration} #{hall_of_fame.first.fit} >> ~/experiment/#{hostname}.txt'")
     fitness_fd.puts(hall_of_fame.first.fit)
     fitness_fd.flush
     best_solution_fd.puts(hall_of_fame.first.dict.to_yaml.inspect)
