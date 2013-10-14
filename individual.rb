@@ -100,11 +100,11 @@ class Individual
       num_changing = rand(LANGUAGES_KEYWORDS[lang][:keyword].size/2).to_i
     end
     
-
     if !rand(3).zero? || @dict[lang][:keyword].empty?
       new_kw = (LANGUAGES_KEYWORDS[lang][:keyword] - @dict[lang][:keyword]).shuffle[0..num_changing]
       old_kw = @dict[lang][:keyword].shuffle[num_changing..-1] 
-#       puts "[ADDING (#{self.object_id}) (#{lang})] #{num_changing}"
+
+      #       puts "[ADDING (#{self.object_id}) (#{lang})] #{num_changing}"
       @dict[lang][:keyword] = (old_kw + new_kw).uniq
     else
       num_changing = num_changing > (0.2 * @dict[lang][:keyword].size) ? (0.2 * @dict[lang][:keyword].size).to_i : num_changing
